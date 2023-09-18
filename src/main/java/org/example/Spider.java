@@ -26,7 +26,7 @@ public class Spider {
     }
 
     private String toFile(String path) {
-        return path.replace(":", "").replace("/", "").replace("\\", "");
+        return "d://att//" + path.replace(":", "").replace(SP, "").replace(".", "");
     }
 
     private String getHtml(String path) throws IOException {
@@ -53,42 +53,57 @@ public class Spider {
         fw.close();
     }
 
-    public List<String> b(String path) throws IOException {
-        List<String> res = new ArrayList<>();
+    public List<Pair> b(String path) throws IOException {
         Document document = Jsoup.parse(getHtml(path));
 
         // 获取所有的链接
         Elements links = document.select("a[href]");
 
-        List<List<String>> list = new ArrayList<>();
+        List<List<Pair>> list = new ArrayList<>();
         for (int i = 0; i < links.size(); i++) {
-            String att = getAtt(links.get(i));
+            Pair att = createAbsoluteUrl(path, getAtt(links.get(i)));
             if (att == null) {
                 continue;
             }
             boolean exist = isExist(att, list);
             if (!exist) {
-                List<String> l = new ArrayList<>();
+                List<Pair> l = new ArrayList<>();
                 l.add(att);
                 list.add(l);
             }
         }
-        List<String> max = new ArrayList<>();
-        for (List<String> l : list) {
+        List<Pair> max = new ArrayList<>();
+        for (List<Pair> l : list) {
             if (l.size() > max.size()) {
                 max = l;
             } else if (l.size() == max.size()) {
-                if (l.get(0).length() < max.get(0).length()) {
+                if (l.get(0).getUrl().length() < max.get(0).getUrl().length()) {
                     max = l;
                 }
             }
         }
+        if (max.size() <= 2) {
+            return null;
+        }
         return max;
     }
 
-    private boolean isExist(String att, List<List<String>> list) {
-        for (List<String> l : list) {
-            if (isSameGroup(l.get(0), att)) {
+    private Pair createAbsoluteUrl(String source, String url) {
+        if (url == null) {
+            return null;
+        }
+        if (url.startsWith("http")) {
+            return new Pair(url, "1");
+        }
+        int ind = source.lastIndexOf(SP);
+        return new Pair(source.substring(0, ind + 1) + url, "2");
+    }
+
+    private static final String SP = "/";
+
+    private boolean isExist(Pair att, List<List<Pair>> list) {
+        for (List<Pair> l : list) {
+            if (isSameGroup(l.get(0).getUrl(), att.getUrl())) {
                 l.add(att);
                 return true;
             }
