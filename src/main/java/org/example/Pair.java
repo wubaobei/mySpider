@@ -29,4 +29,8 @@ public class Pair {
     public String toString() {
         return url + " " + title;
     }
+
+    public boolean isIndex() {
+        return url.contains("index");
+    }
 }

@@ -61,7 +61,7 @@ public class Spider {
 
         List<List<Pair>> list = new ArrayList<>();
         for (int i = 0; i < links.size(); i++) {
-            Pair att = createAbsoluteUrl(path, getAtt(links.get(i)));
+            Pair att = createAbsoluteUrl(path, getAtt(links.get(i)), getTitle(links.get(i)));
             if (att == null) {
                 continue;
             }
@@ -88,15 +88,22 @@ public class Spider {
         return max;
     }
 
-    private Pair createAbsoluteUrl(String source, String url) {
+    private String getTitle(Element element) {
+        if (element.childNodeSize() >= 1) {
+            return element.childNode(0).toString();
+        }
+        return "无名";
+    }
+
+    private Pair createAbsoluteUrl(String source, String url, String title) {
         if (url == null) {
             return null;
         }
         if (url.startsWith("http")) {
-            return new Pair(url, "1");
+            return new Pair(url, title);
         }
         int ind = source.lastIndexOf(SP);
-        return new Pair(source.substring(0, ind + 1) + url, "2");
+        return new Pair(source.substring(0, ind + 1) + url, title);
     }
 
     private static final String SP = "/";
