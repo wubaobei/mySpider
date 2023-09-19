@@ -10,9 +10,13 @@ import java.util.Map;
 // then press Enter. You can now see whitespace characters in your code.
 public class Main {
     public static void main(String[] args) throws IOException {
+        load(LS);
+    }
+
+    private static void load(Pair book) throws IOException {
         Spider spider = new Spider();
         HashMap<String, List<Pair>> map = new HashMap<>();
-        map.put(NEE.getUrl(), spider.b(NEE.getUrl()));
+        map.put(book.getUrl(), spider.b(book.getUrl()));
         while (true) {
             Pair k = null;
             for (Map.Entry<String, List<Pair>> e : map.entrySet()) {
@@ -39,7 +43,7 @@ public class Main {
             }
             map.put(k.getUrl(), list);
         }
-        showMap(map, NEE);
+        showMap(map, book);
     }
 
     private static void showMap(HashMap<String, List<Pair>> map, Pair book) {
@@ -65,4 +69,5 @@ public class Main {
     }
 
     private static Pair NEE = new Pair("http://mana.stmn1.com/Nee/index.htm", "倪柝声文集");
+    private static Pair LS = new Pair("http://mana.stmn1.com/smdj8/index.html", "生命读经");
 }

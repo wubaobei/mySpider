@@ -1,6 +1,7 @@
 package org.example;
 
 import org.jsoup.Jsoup;
+import org.jsoup.nodes.Attribute;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
@@ -13,6 +14,14 @@ import java.util.HashMap;
 import java.util.List;
 
 public class Spider {
+    private List<String> jumpList = new ArrayList<>();
+
+    public Spider() {
+        for (String s : jumpArr) {
+            jumpList.add(s);
+        }
+    }
+
     private String a(String path) throws IOException {
         StringBuilder sb = new StringBuilder();
         URL url = new URL(path);
@@ -53,6 +62,8 @@ public class Spider {
         fw.close();
     }
 
+    private String[] jumpArr = new String[]{"上一卷", "下一卷", "上一篇", "下一篇", "回首页"};
+
     public List<Pair> b(String path) throws IOException {
         Document document = Jsoup.parse(getHtml(path));
 
@@ -63,6 +74,9 @@ public class Spider {
         for (int i = 0; i < links.size(); i++) {
             Pair att = createAbsoluteUrl(path, getAtt(links.get(i)), getTitle(links.get(i)));
             if (att == null) {
+                continue;
+            }
+            if (jumpList.contains(att.getTitle())) {
                 continue;
             }
             boolean exist = isExist(att, list);
@@ -82,7 +96,10 @@ public class Spider {
                 }
             }
         }
-        if (max.size() <= 2) {
+        if (list.size() == 1) {
+            return max;
+        }
+        if (max.size() < 2) {
             return null;
         }
         return max;
@@ -119,10 +136,14 @@ public class Spider {
     }
 
     private String getAtt(Element element) {
-        if (!element.attributes().isEmpty()) {
-            return element.attributes().iterator().next().getValue();
+        if (element.attributes().isEmpty()) {
+            return null;
         }
-        return null;
+        List<Attribute> attributes = element.attributes().asList();
+        if (attributes.size() == 1) {
+            return attributes.get(0).getValue();
+        }
+        return attributes.get(1).getValue();
     }
 
     private boolean isSameGroup(String a, String b) {
