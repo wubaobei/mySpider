@@ -128,6 +128,10 @@ public class Spider {
     private boolean isExist(Pair att, List<List<Pair>> list) {
         for (List<Pair> l : list) {
             if (isSameGroup(l.get(0).getUrl(), att.getUrl())) {
+                if (l.stream().anyMatch(p -> p.getUrl().equals(att.getUrl()))) {
+                    return true;
+                }
+
                 l.add(att);
                 return true;
             }

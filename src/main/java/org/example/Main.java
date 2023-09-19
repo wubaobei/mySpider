@@ -1,5 +1,7 @@
 package org.example;
 
+import java.io.File;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -10,7 +12,7 @@ import java.util.Map;
 // then press Enter. You can now see whitespace characters in your code.
 public class Main {
     public static void main(String[] args) throws IOException {
-        load(LS);
+        load(NEE);
     }
 
     private static void load(Pair book) throws IOException {
@@ -46,9 +48,18 @@ public class Main {
         showMap(map, book);
     }
 
-    private static void showMap(HashMap<String, List<Pair>> map, Pair book) {
-        System.out.println(book.getTitle());
+    private static void showMap(HashMap<String, List<Pair>> map, Pair book) throws IOException {
+        log(book.getTitle() + "\r\n");
         showMap(map, book.getUrl(), 1);
+
+        write(sb.toString(), new File("d://aim//" + book.getTitle() + ".txt"));
+    }
+
+
+    private static void write(String s, File f) throws IOException {
+        FileWriter fw = new FileWriter(f);
+        fw.write(s);
+        fw.close();
     }
 
     private static void showMap(HashMap<String, List<Pair>> map, String c, int deep) {
@@ -57,12 +68,12 @@ public class Main {
         }
         for (Pair p : map.get(c)) {
             for (int i = 0; i < deep; i++) {
-                System.out.print("---");
+                log("-");
             }
             if (p.isIndex()) {
-                System.out.println(p.getTitle());
+                log(p.getTitle() + "\r\n");
             } else {
-                System.out.println(p.toString());
+                log(p.toString() + "\r\n");
             }
             showMap(map, p.getUrl(), deep + 1);
         }
@@ -70,4 +81,11 @@ public class Main {
 
     private static Pair NEE = new Pair("http://mana.stmn1.com/Nee/index.htm", "倪柝声文集");
     private static Pair LS = new Pair("http://mana.stmn1.com/smdj8/index.html", "生命读经");
+
+    private static StringBuilder sb = new StringBuilder();
+
+    private static void log(String s) {
+        sb.append(s);
+        System.out.print(s);
+    }
 }
